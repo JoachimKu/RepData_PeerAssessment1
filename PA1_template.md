@@ -1,12 +1,10 @@
-```{r computetime, echo=FALSE}
-LastUpdate <- format(Sys.time(), "%d.%m.%Y")
-```
+
 
 ## Title: Project Assignment 1 
 Course: Reproducible Research
 
 Author: "JK"  
-Last update: `r LastUpdate`    
+Last update: 16.10.2015    
 
 --------------------------------------
 
@@ -19,7 +17,8 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 ### 1. Loading and preprocessing the data
 
-```{r Preprocession}
+
+```r
 # Load ggplot2 lib
 library(ggplot2)
 
@@ -29,7 +28,8 @@ ActivityData<- read.csv("./data/activity.csv", sep=",", header=TRUE)
 
 ### 2. What is mean total number of steps taken per day?
 
-```{r MeanAndMedian}
+
+```r
 # Aggregate the steps for each day
 StepsPerDay <- tapply(ActivityData$steps, ActivityData$date, FUN=sum)
 
@@ -42,21 +42,25 @@ StepsMedian <- median(StepsPerDay, na.rm=TRUE)
 StepsMedianText <- paste("Median=", format(StepsMedian,  digits=1, nsmall=1))
 ```
 
-The __mean__ of the total number of steps per day is: __`r format(StepsMean, digits=1, nsmall=1)`__  
+The __mean__ of the total number of steps per day is: __10766.2__  
 
-The __median__ of the total number of steps per day is: __`r format(StepsMedian, digits=1, nsmall=1)`__  
+The __median__ of the total number of steps per day is: __10765__  
 
-```{r Histogram}
+
+```r
 # Plot the histogram with a legend
 PlotTitle <- "Histogram of steps per day"
 hist(StepsPerDay, breaks = 10, main=PlotTitle, xlab="Steps per day", ylab="Frequency (days)", col="lightblue")
 legend("topright", legend= c( StepsMeanText, StepsMedianText))
 ```
 
+![plot of chunk Histogram](figure/Histogram-1.png) 
+
 
 ### 3. What is the average daily activity pattern?
 
-```{r DailyPattern}
+
+```r
 # Mean of the steps for each day in the intervals
 ActivityDataClean <- na.omit(ActivityData)
 PatternPerDay <- tapply(ActivityDataClean$steps, ActivityDataClean$interval, FUN=mean)
@@ -74,24 +78,28 @@ abline(h=MaxDataset[1], v=as.numeric(names(MaxDataset[1])), col="blue", lty=3)
 legend("topright", legend=MaxDatasetText)
 ```
 
-The __maximum of average steps__ of the daily activity is __`r format(MaxDataset[1],  digits=1, nsmall=1)`__ 
-at interval __`r names(MaxDataset[1])`__ (see dotted line in the plot)
+![plot of chunk DailyPattern](figure/DailyPattern-1.png) 
+
+The __maximum of average steps__ of the daily activity is __206.2__ 
+at interval __835__ (see dotted line in the plot)
 
 
 ### 4. Imputing missing values  
 
-```{r CountNAs}
+
+```r
 # Summarize the number of NA-values
 NumberofNAs <- sum(is.na(ActivityData$steps))
 ```
 
-The total number of missing values (NA) is __`r NumberofNAs`__
+The total number of missing values (NA) is __2304__
 
 __The strategy for filling all the missing values in the dataset is to set 
 the mean for that 5-minute interval.__
 (Dataset is ActivityDataMean and the col is stepsimp)
 
-```{r Imputing}
+
+```r
 # Transform in Matrix and name the cols
 MeanMatrix<-cbind(as.numeric(names(PatternPerDay)),PatternPerDay)
 colnames(MeanMatrix) <- c("interval","mean")
@@ -116,21 +124,25 @@ StepsMedian <- median(StepsPerDayImp, na.rm=TRUE)
 StepsMedianText <- paste("Median=", format(StepsMedian,  digits=1, nsmall=1))
 ```
 
-The __mean__ of the total number of steps per day is: __`r format(StepsMean, digits=1, nsmall=1)`__  
+The __mean__ of the total number of steps per day is: __10766.2__  
 
-The __median__ of the total number of steps per day is: __`r format(StepsMedian, digits=1, nsmall=1)`__  
+The __median__ of the total number of steps per day is: __10766.2__  
 
-```{r PlotImputing}
+
+```r
 # Plot the histogram with a legend
 PlotTitle <- "Histogram of steps per day (mean for NA's)"
 hist(StepsPerDayImp, breaks = 10, main=PlotTitle, xlab="Steps per day", ylab="Frequency (days)", col="lightblue")
 legend("topright", legend= c( StepsMeanText, StepsMedianText))
 ```
 
+![plot of chunk PlotImputing](figure/PlotImputing-1.png) 
+
 ### 5. Are there differences in activity patterns between weekdays and weekends?
 
 
-```{r ShowTypeOfDay}
+
+```r
 # Add another col for the weekday
 ActivityDataMean$weekday <- weekdays(as.Date(ActivityDataMean$date))
 # and a col for identifying the weekend
@@ -149,5 +161,6 @@ PlotTitle <- "Activity patterns between weekdays and weekends"
 g<-ggplot(PatternPerDayType, aes(interval, stepsimp))+
     geom_line() + facet_grid( dayType~.)
 plot(g)
-
 ```
+
+![plot of chunk ShowTypeOfDay](figure/ShowTypeOfDay-1.png) 
